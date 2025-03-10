@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-blue-600 text-white p-4">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold">Management Dashboard</h1>
+                <div class="space-x-4">
+                    <button onclick="switchModule('water')" class="px-4 py-2 rounded hover:bg-blue-700" id="waterBtn">Water Supply</button>
+                    <button onclick="switchModule('tuition')" class="px-4 py-2 rounded hover:bg-blue-700" id="tuitionBtn">Tuition Fees</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container mx-auto p-4">
+            <!-- Water Supply Module -->
+            <div id="waterModule" class="space-y-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Customer Form -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-4">Add New Customer</h2>
+                        <form id="customerForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium">Name</label>
+                                <input type="text" id="customerName" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Area</label>
+                                <input type="text" id="customerArea" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Contact Number</label>
+                                <input type="tel" id="customerContact" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Add Customer</button>
+                        </form>
+                    </div>
+
+                    <!-- Daily Entry -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-4">Daily Bottle Entry</h2>
+                        <form id="bottleForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium">Customer</label>
+                                <select id="customerSelect" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                                    <option value="">Select Customer</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Number of Bottles</label>
+                                <input type="number" id="bottleCount" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Date</label>
+                                <input type="date" id="supplyDate" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Record Entry</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Customer List -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h2 class="text-xl font-bold mb-4">Customer List</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Area</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customerList" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tuition Module -->
+            <div id="tuitionModule" class="hidden space-y-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Student Form -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-4">Add New Student</h2>
+                        <form id="studentForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium">Student Name</label>
+                                <input type="text" id="studentName" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Class</label>
+                                <input type="text" id="studentClass" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Parent's Contact</label>
+                                <input type="tel" id="parentContact" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Fee Amount (Monthly)</label>
+                                <input type="number" id="feeAmount" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Add Student</button>
+                        </form>
+                    </div>
+
+                    <!-- Fee Payment -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-4">Record Fee Payment</h2>
+                        <form id="feeForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium">Student</label>
+                                <select id="studentSelect" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                                    <option value="">Select Student</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Month</label>
+                                <input type="month" id="feeMonth" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Payment Mode</label>
+                                <select id="paymentMode" class="mt-1 block w-full rounded border-gray-300 shadow-sm p-2" required>
+                                    <option value="cash">Cash</option>
+                                    <option value="upi">UPI</option>
+                                    <option value="card">Card</option>
+                                    <option value="cheque">Cheque</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Record Payment</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Student List -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h2 class="text-xl font-bold mb-4">Student List</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Parent Contact</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fee Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentList" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate unique app slug
+        const appSlug = 'management-app-' + Math.random().toString(36).substring(7);
+        
+        // Initialize data storage
+        let customers = [];
+        let students = [];
+        let bottleEntries = [];
+        let feePayments = [];
+
+        // Module switching
+        function switchModule(module) {
+            document.getElementById('waterModule').classList.toggle('hidden', module !== 'water');
+            document.getElementById('tuitionModule').classList.toggle('hidden', module !== 'tuition');
+            document.getElementById('waterBtn').classList.toggle('bg-blue-700', module === 'water');
+            document.getElementById('tuitionBtn').classList.toggle('bg-blue-700', module === 'tuition');
+        }
+
+        // Water Supply Module Functions
+        document.getElementById('customerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const customer = {
+                name: document.getElementById('customerName').value,
+                area: document.getElementById('customerArea').value,
+                contact: document.getElementById('customerContact').value
+            };
+
+            try {
+                const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer DPSmLDeIYQPcfWZuV8Z5vxz65vp2',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        appSlug,
+                        action: 'create',
+                        collection: 'customers',
+                        data: customer
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    customers.push({ ...customer, _id: result.result.insertedId });
+                    updateCustomerList();
+                    e.target.reset();
+                }
+            } catch (error) {
+                console.error('Error adding customer:', error);
+                alert('Failed to add customer');
+            }
+        });
+
+        // Bottle Entry Form
+        document.getElementById('bottleForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const entry = {
+                customerId: document.getElementById('customerSelect').value,
+                bottles: parseInt(document.getElementById('bottleCount').value),
+                date: document.getElementById('supplyDate').value
+            };
+
+            try {
+                const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer DPSmLDeIYQPcfWZuV8Z5vxz65vp2',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        appSlug,
+                        action: 'create',
+                        collection: 'bottleEntries',
+                        data: entry
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    bottleEntries.push({ ...entry, _id: result.result.insertedId });
+                    e.target.reset();
+                    alert('Entry recorded successfully');
+                }
+            } catch (error) {
+                console.error('Error recording entry:', error);
+                alert('Failed to record entry');
+            }
+        });
+
+        // Tuition Module Functions
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const student = {
+                name: document.getElementById('studentName').value,
+                class: document.getElementById('studentClass').value,
+                parentContact: document.getElementById('parentContact').value,
+                feeAmount: parseFloat(document.getElementById('feeAmount').value)
+            };
+
+            try {
+                const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer DPSmLDeIYQPcfWZuV8Z5vxz65vp2',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        appSlug,
+                        action: 'create',
+                        collection: 'students',
+                        data: student
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    students.push({ ...student, _id: result.result.insertedId });
+                    updateStudentList();
+                    e.target.reset();
+                }
+            } catch (error) {
+                console.error('Error adding student:', error);
+                alert('Failed to add student');
+            }
+        });
+
+        // Update Lists
+        function updateCustomerList() {
+            const list = document.getElementById('customerList');
+            list.innerHTML = customers.map(customer => `
+                <tr>
+                    <td class="px-6 py-4">${customer.name}</td>
+                    <td class="px-6 py-4">${customer.area}</td>
+                    <td class="px-6 py-4">${customer.contact}</td>
+                    <td class="px-6 py-4">
+                        <button onclick="downloadWaterBill('${customer._id}')" class="text-blue-600 hover:text-blue-800 mr-2">
+                            <i class="bi bi-download"></i> Bill
+                        </button>
+                        <button onclick="deleteCustomer('${customer._id}')" class="text-red-600 hover:text-red-800">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStudentList() {
+            const list = document.getElementById('studentList');
+            list.innerHTML = students.map(student => `
+                <tr>
+                    <td class="px-6 py-4">${student.name}</td>
+                    <td class="px-6 py-4">${student.class}</td>
+                    <td class="px-6 py-4">${student.parentContact}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded ${getFeeStatusClass(student._id)}">
+                            ${getFeeStatus(student._id)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <button onclick="downloadFeeBill('${student._id}')" class="text-blue-600 hover:text-blue-800 mr-2">
+                            <i class="bi bi-download"></i> Bill
+                        </button>
+                        <button onclick="deleteStudent('${student._id}')" class="text-red-600 hover:text-red-800">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Export Functions
+        function downloadWaterBill(customerId) {
+            const customer = customers.find(c => c._id === customerId);
+            const entries = bottleEntries.filter(e => e.customerId === customerId);
+            
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet([
+                { Customer: customer.name, Area: customer.area, Contact: customer.contact },
+                { Date: 'Bottles' },
+                ...entries.map(e => ({ Date: e.date, Bottles: e.bottles }))
+            ]);
+            
+            XLSX.utils.book_append_sheet(wb, ws, 'Water Bill');
+            XLSX.writeFile(wb, `water_bill_${customer.name}.xlsx`);
+        }
+
+        function downloadFeeBill(studentId) {
+            const student = students.find(s => s._id === studentId);
+            const payments = feePayments.filter(p => p.studentId === studentId);
+            
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet([
+                { Student: student.name, Class: student.class, Contact: student.parentContact },
+                { Month: 'Amount', Status: '', Mode: '' },
+                ...payments.map(p => ({ Month: p.month, Amount: p.amount, Status: 'Paid', Mode: p.mode }))
+            ]);
+            
+            XLSX.utils.book_append_sheet(wb, ws, 'Fee Bill');
+            XLSX.writeFile(wb, `fee_bill_${student.name}.xlsx`);
+        }
+
+        // Helper Functions
+        function getFeeStatus(studentId) {
+            const payment = feePayments.find(p => p.studentId === studentId);
+            return payment ? 'Paid' : 'Pending';
+        }
+
+        function getFeeStatusClass(studentId) {
+            return getFeeStatus(studentId) === 'Paid' 
+                ? 'bg-green-100 text-green-800' 
+                : 'bg-red-100 text-red-800';
+        }
+
+        // Initialize
+        switchModule('water');
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
